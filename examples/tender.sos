@@ -1,0 +1,130 @@
+(lang sosml 0.1)
+(name tendering)
+(description "This is just a test for the tendering concept")
+
+(structures
+  ( tender
+      (properties (id string)) )
+  ( tender-variant
+      (a (properties (id string)))
+      (b (properties (id string)
+                     (values string list))) )
+  ( tender-base string)
+  ( tender-base-1 (ref tendering.tender) )
+  ( tender-base-2 (ref tender) )
+)
+
+(events
+  (tender_received 
+    (properties
+      (tender_id string)
+      (relay_reference_number string)
+      (event_type (val "Tendering.Tender.TenderReceived"))
+      (version (val 8))
+      (shipment_id string)
+      (total_weight Tender.weight_v1())
+      (total_pieces Tender.pieces_v1())
+      (total_shipping_units Tender.shipping_units_v1())
+      (total_volume Tender.volume_v1())
+      (po_number string option)
+      (tender_on_behalf_of Tender.tender_on_behalf_of_v1())
+      (tenderer string)
+      (notes string list)
+      (customer_linehaul Tender.money_v1())
+      (estimated_customer_fuel_surcharge Tender.money_v1())
+      (planned_distance Tender.distance_v1())
+      (orders [order_v2()] list)
+      (routing_option routing_option_v2())
+      (accessorials Tender.accessorial_v2() list)
+      (accessorial_codes string list)
+      (is_new_tender boolean)
+      (service_line Relay.ServiceLine.t()) ) )
+)
+
+#|
+ `map_to` is a specialization of a pure function. To provides a single interface
+  to a map to function which provides a single match clause from input a to b.
+
+  Any properties on the destination type is assumed to be any valid value.
+
+  (match_all) is a special case where any value in the input will match on the output
+  if it exists there.
+|#
+(map_to
+  (receive_tender tender_received
+                  (match_all)
+                  (= tender_id tender_id))
+  (tender_received tender
+                  (match_all (except version event_type is_new_tender))
+                  (is_initilizing tender) )
+)
+
+#|
+  functions must be "pure" in the sense they they can not touch stores or services.
+  They may be impure in the sense that they are observed by telemetery. This means
+  that the input and output must be consistent, also. So no random generator here.
+
+  In some system's it may be possible to side effects based on telemetery but...ewww
+|#
+(functions
+  (add a b (a + b))
+  (add_one a (add a 1))
+)
+
+#|
+  Opertations are functions or methods that needs to interact with a store or another
+  service
+|#
+(operations
+  (receive_tender
+    (input receive_tender)
+    (output no_return)
+    (let key   input.tender_id)
+    (let event map_to tender_received)
+    (let state read tender_aggregate_stream)
+    (when
+      (event not in state)
+      (event is_initilizing) )
+    (write tender_aggregate_stream event) )
+)
+
+(stores
+  (tender_aggregate_stream
+    (is_a event_store)
+    (key_is tender_id) ; allows the event store to accept anything that is a struct with a tender_id property
+    (protocol (http 2))
+    (servers (uri https://abc.com/tendering.tender)) )
+  (tender_aggregate_snapshot
+    (is_a key_value)
+    (key_is relay_reference_number) )
+)
+
+(services ())
+
+(protocols
+  (http 1.1)
+  (http 2)
+)
+
+(protocol_binding
+  (http 1.1
+    (listen (port 4000)) )
+  (http 2
+    (stream_client stores.tender_aggregate_stream
+      ( operations.receive_tender
+        operations.add_accessorial
+      )
+    )
+  )
+)
+
+(telemetery
+  (counter cmd_counter (when receive_tender (+ 1)))
+  (log 'a (when receive_tender))
+)
+
+(abstraction
+  (event_store (is_a 'key -> 'a list) ; assume a list per 'key
+               (operation write (state('key) snoc)) ; implies state <| 'a -- but polymorphics can't be well supported so this implies the events are structs also, PM
+               (operation read  (state('key) identity)) ) ; assumes we just return the entire list
+)
