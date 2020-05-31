@@ -1,18 +1,7 @@
 (lang sosml 0.1)
-(name tendering)
 (description "This is just a test for the tendering concept")
-
-(structures
-  ( tender
-      (properties (id string)) )
-  ( tender-variant
-      (a (properties (id string)))
-      (b (properties (id string)
-                     (values string list))) )
-  ( tender-base string)
-  ( tender-base-1 (ref tendering.tender) )
-  ( tender-base-2 (ref tender) )
-)
+(name tendering)
+;; May want author and git location and such
 
 (events
   (tender_received 
@@ -41,6 +30,18 @@
       (service_line Relay.ServiceLine.t()) ) )
 )
 
+(structures
+  ( tender
+      (properties (id string)) )
+  ( tender-variant
+      (a (properties (id string)))
+      (b (properties (id string)
+                     (values string list))) )
+  ( tender-base string)
+  ( tender-base-1 (ref tendering.tender) )
+  ( tender-base-2 (ref tender) )
+)
+
 #|
  `map_to` is a specialization of a pure function. To provides a single interface
   to a map to function which provides a single match clause from input a to b.
@@ -53,10 +54,10 @@
 (map_to
   (receive_tender tender_received
                   (match_all)
-                  (= tender_id tender_id))
+                  (= tender_id tender_id) )
   (tender_received tender
-                  (match_all (except version event_type is_new_tender))
-                  (is_initilizing tender) )
+                  (is_initilizing tender)
+                  (match_all (except version event_type is_new_tender)) )
 )
 
 #|
@@ -120,7 +121,7 @@
 
 (telemetery
   (counter cmd_counter (when receive_tender (+ 1)))
-  (log 'a (when receive_tender))
+  (log 'a (when receive_tender)) ; perhaps this should be some string, then we could match on what is logged later with some concept of pattern matching
 )
 
 (abstraction

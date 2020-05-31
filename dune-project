@@ -21,7 +21,13 @@
     (ocaml (>= 4.08))
 
     (bos (>= 0.2))
-    (parsexp (>= 0.13))
+    (cmdliner (>= 1.0))
+    (ppx_sexp_conv (>= 0.13))
+    (sexplib (>= 0.13))
+
+    (ppx_deriving (>= 4.5))
+    (ppx_inline_test (and :with-test (>= 0.13)))
+    (ppx_expect (and :with-test (>= 0.13)))
 
     (merlin :dev)
     (ocamlformat :dev)

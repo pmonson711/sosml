@@ -1,4 +1,4 @@
 (executable
  (public_name sosml)
  (name main)
- (libraries sosml))
+ (libraries sosml bos cmdliner))
