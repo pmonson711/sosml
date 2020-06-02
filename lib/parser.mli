@@ -13,3 +13,7 @@ val print_endline : t -> unit
 val get_version : [< `Parsed of Sexplib.Sexp.t ] -> Version.t
 
 val get_service : [< `Rewritten of Sexplib.Sexp.t ] -> Service.t
+
+val get_structures : t -> Structure.t list
+
+val get_events : t -> Structure.t list

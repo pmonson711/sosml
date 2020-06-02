@@ -33,6 +33,24 @@ let rewrite_version (`Parsed sexp) = Version.rewrite sexp |> rewritten
 
 let get_service (`Rewritten sexp) = sexp |> Service.t_of_sexp
 
+let get_structures sexp =
+  sexp
+  |> get_val
+  |> Structure.get_key "structures"
+  |> Option.value ~default:[]
+  |> List.map Structure.t_of_sexp
+  |> List.flatten
+
+
+let get_events sexp =
+  sexp
+  |> get_val
+  |> Structure.get_key "events"
+  |> Option.value ~default:[]
+  |> List.map Structure.t_of_sexp
+  |> List.flatten
+
+
 let%expect_test _ =
   let src =
     {|
