@@ -2,9 +2,14 @@ open Sexplib.Conv
 
 type ptype =
   | String
+  | VString of string
   | Int
+  | VInt    of int
   | Float
-  | List   of ptype
+  | VFloat  of float
+  | Option  of ptype
+  | List    of ptype
+  | Set     of ptype
 [@@deriving sexp, show]
 
 type property = string * ptype [@@deriving sexp, show]
@@ -81,6 +86,53 @@ let get_key name sexp =
 
 
 let get_key_exn name sexp = get_key name sexp |> Option.get
+
+module Type : sig
+  val string : ptype
+
+  val static_string : string -> ptype
+
+  val int : ptype
+
+  val static_int : int -> ptype
+
+  val float : ptype
+
+  val static_float : float -> ptype
+
+  val property : string -> ptype -> property
+
+  val reference : string -> string -> t
+
+  val alias : string -> ptype -> t
+
+  val structure : string -> property list -> t
+
+  val variant : string -> string -> property list -> t
+end = struct
+  let string = String
+
+  let static_string string = VString string
+
+  let int = Int
+
+  let static_int int = VInt int
+
+  let float = Float
+
+  let static_float float = VFloat float
+
+  let property name ptype = (name, ptype)
+
+  let reference name reference_of = Reference { name; reference_of }
+
+  let alias name alias_of = Alias { name; alias_of }
+
+  let structure name properties = Basic { name; properties }
+
+  let variant variant name properties =
+    Variant (variant, { name; properties })
+end
 
 let%expect_test _ =
   let wrap = Printf.sprintf "(%s)" in

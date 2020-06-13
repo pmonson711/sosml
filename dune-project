@@ -24,10 +24,11 @@
     (cmdliner (>= 1.0))
     (ppx_sexp_conv (>= 0.13))
     (sexplib (>= 0.13))
-
     (ppx_deriving (>= 4.5))
+
     (ppx_inline_test (and :with-test (>= 0.13)))
     (ppx_expect (and :with-test (>= 0.13)))
+    (alcotest-lwt (and :with-test (>= 1.1)))
 
     (merlin :dev)
     (ocamlformat :dev)

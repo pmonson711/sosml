@@ -1,2 +1,5 @@
 (test
- (name sosml))
+ (name sosml)
+ (libraries alcotest sosml)
+ (action
+  (run %{test} --show-errors --color=always)))

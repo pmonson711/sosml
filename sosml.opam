@@ -19,6 +19,7 @@ depends: [
   "ppx_deriving" {>= "4.5"}
   "ppx_inline_test" {with-test & >= "0.13"}
   "ppx_expect" {with-test & >= "0.13"}
+  "alcotest-lwt" {with-test & >= "1.1"}
   "merlin" {dev}
   "ocamlformat" {dev}
   "ocp-indent" {dev}
