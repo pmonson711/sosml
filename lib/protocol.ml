@@ -1,8 +1,6 @@
-open Sexplib.Conv
+type name = string [@@deriving show]
 
-type name = string [@@deriving sexp, show]
-
-type version = string [@@deriving sexp, show]
+type version = string [@@deriving show]
 
 type t =
   { name : name
@@ -23,8 +21,7 @@ let get_key sexp =
   let open Sexplib.Sexp in
   let find lst =
     List.find_map
-      (fun x ->
-        match x with List (Atom "protocols" :: tl) -> Some tl | _ -> None)
+      (function List (Atom "protocols" :: tl) -> Some tl | _ -> None)
       lst
   in
   match sexp with List lst -> find lst | _ -> None

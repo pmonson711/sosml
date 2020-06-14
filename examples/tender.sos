@@ -93,8 +93,7 @@
   (tender_aggregate_stream
     (is_a event_store)
     (key_is tender_id) ; allows the event store to accept anything that is a struct with a tender_id property
-    (protocol (http 2))
-    (servers (uri https://abc.com/tendering.tender)) )
+    (protocol (http 2)))
   (tender_aggregate_snapshot
     (is_a key_value)
     (key_is relay_reference_number) )
@@ -126,6 +125,9 @@
 
 (abstraction
   (event_store (is_a 'key -> 'a list) ; assume a list per 'key
-               (operation write (state('key) snoc)) ; implies state <| 'a -- but polymorphics can't be well supported so this implies the events are structs also, PM
-               (operation read  (state('key) identity)) ) ; assumes we just return the entire list
+               (operation write (state 'key snoc)) ; implies state <| 'a -- but polymorphics can't be well supported so this implies the events are structs also, PM
+               (operation read  (state 'key identity)) ) ; assumes we just return the entire list
+  (key_value (is_a 'key -> 'value)
+  	     (operation get (state 'key access))
+	     (operation put (state 'key set)))
 )
