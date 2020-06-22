@@ -36,5 +36,6 @@
     (ocp-index :dev)
     (odig :dev)
     (utop :dev)
+    (bisect_ppx :dev)
   )
  )

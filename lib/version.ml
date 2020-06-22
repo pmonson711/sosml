@@ -1,6 +1,6 @@
-type version = float
+type version = float [@@deriving show, eq]
 
-type t = { version : version }
+type t = { version : version } [@@deriving show, eq]
 
 let current =
   let open Sexplib.Sexp in

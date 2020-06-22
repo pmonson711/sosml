@@ -3,4 +3,5 @@
  (libraries parsexp sexplib)
  (inline_tests)
  (preprocess
-  (pps ppx_deriving.show ppx_sexp_conv ppx_inline_test ppx_expect)))
+  (pps ppx_deriving.show ppx_deriving.eq ppx_sexp_conv ppx_inline_test
+    ppx_expect bisect_ppx --conditional)))
