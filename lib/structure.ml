@@ -66,7 +66,6 @@ let t_of_sexp sexp =
               Alias { name; alias_of = ptype_of_sexp (Atom alias) })
         lst
   | _ ->
-      print_endline "abc" ;
       failwith (Sexplib.Sexp.to_string_hum sexp)
 
 
@@ -146,9 +145,11 @@ let%expect_test _ =
       (properties (id string)(key (list string))) ) ;; TODO should accept (key string list)
   ( tender-variant
       (a (properties (id string)))
+      (c (properties (id string)(key (list int))))
       (b (properties (id string) (key string))))
   ( tender-base string)
-  ( tender-base-2 (ref tendering.tender) ))
+  ( tender-base-2 (ref tendering.tender) )
+)
     |}
   in
   src
@@ -169,6 +170,11 @@ let%expect_test _ =
     (Structure.Variant ("a",
        { Structure.name = "tender-variant";
          properties = [("id", Structure.String)] }
+       ))
+    (Structure.Variant ("c",
+       { Structure.name = "tender-variant";
+         properties =
+         [("id", Structure.String); ("key", (Structure.List Structure.Int))] }
        ))
     (Structure.Variant ("b",
        { Structure.name = "tender-variant";

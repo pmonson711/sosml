@@ -1,5 +1,5 @@
 (library
- (name sosml)
+ (public_name sosml)
  (libraries parsexp sexplib)
  (inline_tests)
  (preprocess

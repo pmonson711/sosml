@@ -14,12 +14,10 @@ let wrap = Printf.sprintf "(%s)"
 let parse str =
   str |> wrap |> Parsexp.Single.parse_string |> Result.map parsed
 
-
 let parse_exn str = str |> wrap |> Parsexp.Single.parse_string_exn |> parsed
 
 let print_endline sexp =
   sexp |> get_val |> Sexplib0.Sexp.to_string_hum |> print_endline
-
 
 let unwrap =
   let open Sexplib in
@@ -50,6 +48,10 @@ let get_events sexp =
   |> List.map Structure.t_of_sexp
   |> List.flatten
 
+
+(****************************************************************************)
+(*** Expect Tests ***********************************************************)
+(****************************************************************************)
 
 let%expect_test _ =
   let src =
