@@ -7,10 +7,9 @@ let run =
   | Error _ ->
       failwith "shit"
 
-
 let cmd =
   let open Cmdliner in
   let doc = "Reads and prints example" in
   let exits = Term.default_exits in
-  let man = [ `S Manpage.s_description; `P doc ] in
+  let man = [`S Manpage.s_description; `P doc] in
   (Term.(const run), Term.info "read_print" ~doc ~exits ~man)

@@ -3,17 +3,12 @@ open Cmdliner
 let info =
   let doc = "parsesr for sosml" in
   let man =
-    [ `S Manpage.s_bugs; `P "Email bug reports to <pmonson711@gmail.com>" ]
+    [`S Manpage.s_bugs; `P "Email bug reports to <pmonson711@gmail.com>"]
   in
-  Term.info
-    "oevtstore"
-    ~version:"%%%VERSION%%"
-    ~doc
-    ~exits:Term.default_exits
+  Term.info "oevtstore" ~version:"%%%VERSION%%" ~doc ~exits:Term.default_exits
     ~man
 
-
-let cmds = [ Read_print.cmd ]
+let cmds = [Read_print.cmd]
 
 type verb =
   | Normal
@@ -21,23 +16,21 @@ type verb =
   | Verbose
 
 type copts =
-  { debug : bool
-  ; verb : verb
-  }
+  { debug: bool
+  ; verb: verb }
 
-let copts debug verb = { debug; verb }
+let copts debug verb = {debug; verb}
 
 let copts_t =
-  let debug = Arg.(value & flag & info [ "debug" ]) in
+  let debug = Arg.(value & flag & info ["debug"]) in
   let verb =
     let doc = "Suppress informational output." in
-    let quiet = (Quiet, Arg.info [ "q"; "quiet" ] ~doc) in
+    let quiet = (Quiet, Arg.info ["q"; "quiet"] ~doc) in
     let doc = "Give verbose output." in
-    let verbose = (Verbose, Arg.info [ "v"; "verbose" ] ~doc) in
-    Arg.(last & vflag_all [ Normal ] [ quiet; verbose ])
+    let verbose = (Verbose, Arg.info ["v"; "verbose"] ~doc) in
+    Arg.(last & vflag_all [Normal] [quiet; verbose])
   in
   Term.(const copts $ debug $ verb)
-
 
 let default_cmd =
   let doc = "eventstore" in
@@ -53,11 +46,9 @@ let default_cmd =
     ; `Noblank
     ; `P "Use `$(mname) help environment' for help on environment variables."
     ; `S Manpage.s_bugs
-    ; `P "Check bug reports to <pmonson@echo.com>"
-    ]
+    ; `P "Check bug reports to <pmonson@echo.com>" ]
   in
   ( Term.(ret (const (fun _ -> `Help (`Pager, None)) $ copts_t))
   , Term.info "main" ~version:"v0.1.0" ~doc ~sdocs ~exits ~man )
-
 
 let () = Term.(exit @@ eval_choice default_cmd cmds)

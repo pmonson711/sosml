@@ -1,34 +1,28 @@
 type rel = IsA of string [@@deriving show]
 
 type binding =
-  | Name        of string * string
+  | Name of string * string
   | SexpBinding of string * Sexplib.Sexp.t
 [@@deriving show]
 
 type t =
-  { name : string
-  ; is_a : rel
-  ; bindings : binding list
-  ; protocol : Protocol.t list
-  }
+  { name: string
+  ; is_a: rel
+  ; bindings: binding list
+  ; protocol: Protocol.t list }
 [@@deriving show]
 
 let ( % ) f g x = g (f x)
 
 let t_of_sexp (sexp : Sexplib.Sexp.t) : t =
   let open Sexplib.Sexp in
-  let find_name = function
-    | List (Atom n :: tl) ->
-        Some (n, tl)
-    | _                   ->
-        None
-  in
+  let find_name = function List (Atom n :: tl) -> Some (n, tl) | _ -> None in
   let find_is_a =
     List.find_map (function
-        | List [ Atom "is_a"; Atom tl ] ->
-            Some (IsA tl)
-        | _ ->
-            None)
+      | List [Atom "is_a"; Atom tl] ->
+          Some (IsA tl)
+      | _ ->
+          None)
   in
   let find_bindings =
     let is_binding str =
@@ -37,23 +31,19 @@ let t_of_sexp (sexp : Sexplib.Sexp.t) : t =
           None
     in
     List.filter_map (function
-        | List (Atom n :: tl) ->
-          ( match is_binding n with
-          | Some x ->
-              Some (x, List tl)
-          | None   ->
-              None )
-        | _                   ->
-            None)
+      | List (Atom n :: tl) -> (
+        match is_binding n with Some x -> Some (x, List tl) | None -> None )
+      | _ ->
+          None)
     % List.map (fun (x, tl) -> SexpBinding (x, tl))
   in
   let find_protocols lst =
     lst
     |> List.find_map (function
-           | List (Atom "protocol" :: tl) ->
-               Some tl
-           | _ ->
-               None)
+         | List (Atom "protocol" :: tl) ->
+             Some tl
+         | _ ->
+             None)
     |> Option.value ~default:[]
     |> List.map Protocol.t_of_sexp
   in
@@ -61,8 +51,7 @@ let t_of_sexp (sexp : Sexplib.Sexp.t) : t =
   let is_a = find_is_a rest |> Option.get in
   let bindings = find_bindings rest in
   let protocol = find_protocols rest in
-  { name; is_a; bindings; protocol }
-
+  {name; is_a; bindings; protocol}
 
 let get_key sexp =
   let open Sexplib.Sexp in
@@ -72,7 +61,6 @@ let get_key sexp =
       lst
   in
   match sexp with List lst -> find lst | _ -> None
-
 
 let get_key_exn sexp = get_key sexp |> Option.get
 
@@ -100,10 +88,7 @@ let%expect_test _ =
 	     (operation put (state 'key set))))
     |}
   in
-  src
-  |> wrap
-  |> Parsexp.Single.parse_string_exn
-  |> get_key_exn
+  src |> wrap |> Parsexp.Single.parse_string_exn |> get_key_exn
   |> List.map (t_of_sexp % show)
   |> List.iter print_endline ;
   [%expect

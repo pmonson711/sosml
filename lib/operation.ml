@@ -13,23 +13,22 @@ type bind = string [@@deriving show, eq]
 type guard = string list [@@deriving show, eq]
 
 type rexp =
-  | String  of string
-  | MapTo   of string
+  | String of string
+  | MapTo of string
   | FunCall of string
-  | OpCall  of string list
+  | OpCall of string list
 [@@deriving show, eq]
 
 type lexp =
-  | Let    of bind * rexp
-  | When   of guard list
+  | Let of bind * rexp
+  | When of guard list
   | OpCall of string list
 [@@deriving show, eq]
 
 type t =
-  { name : string
-  ; input : input
-  ; output : output
-  }
+  { name: string
+  ; input: input
+  ; output: output }
 [@@deriving show, eq]
 
 let get_key sexp =
@@ -44,4 +43,3 @@ let get_key sexp =
 let get_key_exn sexp = get_key sexp |> Option.get
 
 let ( % ) f g x = g (f x)
-

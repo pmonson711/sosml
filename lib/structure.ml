@@ -4,70 +4,66 @@ type ptype =
   | String
   | VString of string
   | Int
-  | VInt    of int
+  | VInt of int
   | Float
-  | VFloat  of float
-  | Option  of ptype
-  | List    of ptype
-  | Set     of ptype
+  | VFloat of float
+  | Option of ptype
+  | List of ptype
+  | Set of ptype
 [@@deriving sexp, show]
 
 type property = string * ptype [@@deriving sexp, show]
 
 type reference =
-  { name : string
-  ; reference_of : string
-  }
+  { name: string
+  ; reference_of: string }
 [@@deriving show]
 
 type alias =
-  { name : string
-  ; alias_of : ptype
-  }
+  { name: string
+  ; alias_of: ptype }
 [@@deriving show]
 
 type structure =
-  { name : string
-  ; properties : property list
-  }
+  { name: string
+  ; properties: property list }
 [@@deriving show]
 
 type t =
-  | Alias     of alias
-  | Basic     of structure
+  | Alias of alias
+  | Basic of structure
   | Reference of reference
-  | Variant   of string * structure
+  | Variant of string * structure
 [@@deriving show]
 
 let t_of_sexp sexp =
   let open Sexplib.Sexp in
   let get_properties name = function
-    | [ Atom "properties"; List props ] ->
-        Basic { name; properties = [ property_of_sexp (List props) ] }
+    | [Atom "properties"; List props] ->
+        Basic {name; properties= [property_of_sexp (List props)]}
     | Atom "properties" :: props ->
-        Basic { name; properties = List.map property_of_sexp props }
-    | [ Atom var; List (Atom "properties" :: props) ] ->
-        Variant (var, { name; properties = List.map property_of_sexp props })
-    | [ Atom "ref"; Atom reference ] ->
-        Reference { name; reference_of = reference }
+        Basic {name; properties= List.map property_of_sexp props}
+    | [Atom var; List (Atom "properties" :: props)] ->
+        Variant (var, {name; properties= List.map property_of_sexp props})
+    | [Atom "ref"; Atom reference] ->
+        Reference {name; reference_of= reference}
     | _ ->
         failwith (Sexplib.Sexp.to_string_hum sexp)
   in
   match sexp with
-  | List [ Atom name; List lst ] ->
-      [ get_properties name lst ]
+  | List [Atom name; List lst] ->
+      [get_properties name lst]
   | List (Atom name :: lst) ->
       List.map
         (fun x ->
           match x with
-          | List v     ->
+          | List v ->
               get_properties name v
           | Atom alias ->
-              Alias { name; alias_of = ptype_of_sexp (Atom alias) })
+              Alias {name; alias_of= ptype_of_sexp (Atom alias)})
         lst
   | _ ->
       failwith (Sexplib.Sexp.to_string_hum sexp)
-
 
 let get_key name sexp =
   let open Sexplib.Sexp in
@@ -82,7 +78,6 @@ let get_key name sexp =
       lst
   in
   match sexp with List lst -> find lst | _ -> None
-
 
 let get_key_exn name sexp = get_key name sexp |> Option.get
 
@@ -123,14 +118,13 @@ end = struct
 
   let property name ptype = (name, ptype)
 
-  let reference name reference_of = Reference { name; reference_of }
+  let reference name reference_of = Reference {name; reference_of}
 
-  let alias name alias_of = Alias { name; alias_of }
+  let alias name alias_of = Alias {name; alias_of}
 
-  let structure name properties = Basic { name; properties }
+  let structure name properties = Basic {name; properties}
 
-  let variant variant name properties =
-    Variant (variant, { name; properties })
+  let variant variant name properties = Variant (variant, {name; properties})
 end
 
 let%expect_test _ =
@@ -152,12 +146,8 @@ let%expect_test _ =
 )
     |}
   in
-  src
-  |> wrap
-  |> Parsexp.Single.parse_string_exn
-  |> get_key_exn "structures"
-  |> List.map t_of_sexp
-  |> List.flatten
+  src |> wrap |> Parsexp.Single.parse_string_exn |> get_key_exn "structures"
+  |> List.map t_of_sexp |> List.flatten
   |> List.iter (fun s -> s |> show |> print_endline) ;
   [%expect
     {|

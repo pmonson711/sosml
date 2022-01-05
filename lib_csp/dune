@@ -1,0 +1,6 @@
+(library
+ (name sosml_csp)
+ (inline_tests)
+ (preprocess
+  (pps ppx_deriving.show ppx_deriving.eq ppx_inline_test ppx_expect
+    bisect_ppx --conditional)))
