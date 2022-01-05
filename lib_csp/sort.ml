@@ -1,8 +1,14 @@
-type sort_name = string [@@deriving show]
+module SortName = struct
+  type t = string [@@deriving show]
+end
 
-type struct_name = string [@@deriving show]
+module StructName = struct
+  type t = string [@@deriving show]
+end
 
-type accessor_name = string [@@deriving show]
+module AccessorName = struct
+  type t = string [@@deriving show]
+end
 
 type sort =
   | Bool
@@ -17,14 +23,14 @@ type sort =
   | FBag of sort
   | Id of string
   | Ref of string
-  | Struct of struct_name * property list
+  | Struct of StructName.t * property list
   | Variants of sort list
 
-and property = accessor_name * sort [@@deriving show]
+and property = AccessorName.t * sort [@@deriving show]
 
 type t =
-  | Untyped of sort_name
-  | Typed of sort_name * sort
+  | Untyped of SortName.t
+  | Typed of SortName.t * sort
 
 module T : sig
   val bool : string -> t

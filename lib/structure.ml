@@ -60,7 +60,7 @@ let t_of_sexp sexp =
           | List v ->
               get_properties name v
           | Atom alias ->
-              Alias {name; alias_of= ptype_of_sexp (Atom alias)})
+              Alias {name; alias_of= ptype_of_sexp (Atom alias)} )
         lst
   | _ ->
       failwith (Sexplib.Sexp.to_string_hum sexp)
@@ -74,7 +74,7 @@ let get_key name sexp =
         | List (Atom _name :: tl) when _name = name ->
             Some tl
         | _ ->
-            None)
+            None )
       lst
   in
   match sexp with List lst -> find lst | _ -> None

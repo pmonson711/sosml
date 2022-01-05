@@ -24,7 +24,7 @@ let t_of_sexp (sexp : Sexplib0.Sexp.t) =
     | _ ->
         failwith
           (Printf.sprintf "unexpected input %s"
-             (Sexplib.Sexp.to_string_hum sexp))
+             (Sexplib.Sexp.to_string_hum sexp) )
   in
   {version}
 

@@ -22,7 +22,7 @@ let t_of_sexp (sexp : Sexplib.Sexp.t) : t =
       | List [Atom "is_a"; Atom tl] ->
           Some (IsA tl)
       | _ ->
-          None)
+          None )
   in
   let find_bindings =
     let is_binding str =
@@ -34,7 +34,7 @@ let t_of_sexp (sexp : Sexplib.Sexp.t) : t =
       | List (Atom n :: tl) -> (
         match is_binding n with Some x -> Some (x, List tl) | None -> None )
       | _ ->
-          None)
+          None )
     % List.map (fun (x, tl) -> SexpBinding (x, tl))
   in
   let find_protocols lst =
@@ -43,7 +43,7 @@ let t_of_sexp (sexp : Sexplib.Sexp.t) : t =
          | List (Atom "protocol" :: tl) ->
              Some tl
          | _ ->
-             None)
+             None )
     |> Option.value ~default:[]
     |> List.map Protocol.t_of_sexp
   in
@@ -73,7 +73,7 @@ let%expect_test _ =
   (tender_aggregate_stream
     (is_a event_store)
     (key_is tender_id) ; allows the event store to accept anything that is a struct with a tender_id property
-    (protocol (http 2)))
+    (protocol (http 2) (http 1.1)))
   (tender_aggregate_snapshot
     (is_a key_value)
     (key_is relay_reference_number) )
@@ -95,7 +95,10 @@ let%expect_test _ =
     {|
     { Stores.name = "tender_aggregate_stream"; is_a = (Stores.IsA "event_store");
       bindings = [(Stores.SexpBinding ("key", (tender_id)))];
-      protocol = [{ Protocol.name = "http"; version = "2" }] }
+      protocol =
+      [{ Protocol.name = "http"; version = "2" };
+        { Protocol.name = "http"; version = "1.1" }]
+      }
     { Stores.name = "tender_aggregate_snapshot"; is_a = (Stores.IsA "key_value");
       bindings = [(Stores.SexpBinding ("key", (relay_reference_number)))];
       protocol = [] } |}]
